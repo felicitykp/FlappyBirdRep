@@ -15,22 +15,31 @@ public class GameWindow extends JPanel {
 	
 	
 	//VARIABLES
-	public static final int UP_ARROW = 38;
-	public static final int DOWN_ARROW = 40;
 	//background variables
 		public int windowW = 488, windowH = 712;
 		public Image backgroundImage;
 	//bird variables
 		public Image birdImage;
-		public int birdW = 40, birdH = 30;
-		public int birdX = (windowW/2) - (birdW/2), birdY = (windowH / 2) - birdH;
+		public double birdW = 40, birdH = 30;
+		public double birdX = (windowW/2) - (birdW/2), birdY = (windowH / 2) - birdH;
+		public double birdVel = 0;
+		public double gravity = 0.5;
+	//pipe variables
+		public Image pipe;
+		public double pipeX1 =  windowW * 0.75, pipeY1 = 0;
+		public double pipeW = 52, pipeH = 320;
+		public double pipeVel;
 	
 	//CONSTRUCTOR
-	public GameWindow() throws IOException {
+	public GameWindow() throws IOException, InterruptedException {
 		
 		//customize the panel
 		this.setPreferredSize(new Dimension(windowW, windowH));
+		
+		//load initial Images
 		backgroundImage = ImageIO.read(new File("background-day.png"));
+		birdImage = ImageIO.read(new File("birdMid.png"));
+		pipe = ImageIO.read(new File("pipeTop.png"));
 
 		//make frame to hold panel
 		JFrame mainFrame = new JFrame("Flappy Bird");
@@ -39,44 +48,70 @@ public class GameWindow extends JPanel {
 		mainFrame.setResizable(false);
 		mainFrame.add(this);
 		mainFrame.setVisible(true);
-
-		//setup bird
-		birdImage = ImageIO.read(new File("birdMid.png"));
 		
 		//setup key listener
 		mainFrame.addKeyListener(new KeyListener() {
-
-			public void keyTyped(KeyEvent e) {
-				if(e.getKeyCode() == UP_ARROW) { 
-					if(birdY < 0) {
-						birdY--;
-					}
-					
-				} else if (e.getKeyCode() == DOWN_ARROW) { 
-					if(birdY > windowH) {
-						birdY++;
-					}
-				}
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyChar() == ' ') { 
+					if(birdY > 0) {
+						birdVel = -9;
+					} 
+				} 
+				mainFrame.getContentPane().repaint();
 			}
-			
-			public void keyPressed(KeyEvent e) {}
+			public void keyTyped(KeyEvent e) {}
 			public void keyReleased(KeyEvent e) {}	
-			
 		});
+		
+		//run the code
+		while(true) {
+			moveBird();
+			movePipe();
+			mainFrame.getContentPane().repaint();
+			Thread.sleep(33);
+		}
 		
 	}
 	
 	//METHODS
 	public void paint(Graphics g) {
 		g.drawImage(backgroundImage, 0, 0, windowW, windowH, null);
-		g.drawImage(birdImage, birdX, birdY, birdW, birdH, null);
+		g.drawImage(birdImage, (int)(birdX), (int)(birdY), (int)(birdW), (int)(birdH), null);
+		g.drawImage(pipe, (int)(pipeX1), (int)(pipeY1), (int)(pipeW), (int)(pipeH), null);
 	}
 	
+	public void moveBird() throws IOException {
+		//have the velocity be constantly changed by gravity
+		birdVel += gravity;
+		//change the pic based on the velocity
+		setBirdPic();
+		if(birdY < windowH-(birdH*2) && birdY > 0) {
+			birdY += birdVel;
+		} else if(birdY >= windowH-(birdH*2) && birdVel < 0) {
+			birdY += birdVel;
+		} else if(birdY <= 0 && birdVel > 0) {
+			birdY += birdVel;
+		}
+	}
+	
+	public void setBirdPic() throws IOException {
+		if(birdVel < -0.5) {
+			birdImage = ImageIO.read(new File("birdUp.png"));
+		} else if(birdVel > 0.5) {
+			birdImage = ImageIO.read(new File("birdDown.png"));
+		} else {
+			birdImage = ImageIO.read(new File("birdMid.png"));
+		}
+	}
+	
+	public void movePipe() {
+		pipeX1 -= pipeVel;
+	}
+	
+	
 	//MAIN
-	public static void main(String[] args) throws IOException {
-		
+	public static void main(String[] args) throws IOException, InterruptedException {
 		GameWindow myGame = new GameWindow();
-		
 	}
 }
 
