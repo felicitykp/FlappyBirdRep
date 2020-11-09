@@ -29,6 +29,8 @@ public class GameWindow extends JPanel {
 		public double pipeW = 52, pipeH = 320;
 		public double pipeX1 =  (windowW * 0.75), pipeY1 = 0;
 		public double pipeX2 = (windowW + (windowW * 0.25)), pipeY2 = windowH - pipeH;
+		public double pipeX3 = (windowW + (windowW * 0.75)), pipeY3 = 0;
+		public double pipeX4 = (windowW + (windowW * 1.25)), pipeY4 = windowH - pipeH;
 		public double pipeVel = 3;
 	
 	//CONSTRUCTOR
@@ -81,6 +83,8 @@ public class GameWindow extends JPanel {
 		g.drawImage(birdImage, (int)(birdX), (int)(birdY), (int)(birdW), (int)(birdH), null);
 		g.drawImage(pipeTop, (int)(pipeX1), (int)(pipeY1), (int)(pipeW), (int)(pipeH), null);
 		g.drawImage(pipeBottom, (int)(pipeX2), (int)(pipeY2), (int)(pipeW), (int)(pipeH), null);
+		g.drawImage(pipeTop, (int)(pipeX3), (int)(pipeY3), (int)(pipeW), (int)(pipeH), null);
+		g.drawImage(pipeBottom, (int)(pipeX4), (int)(pipeY4), (int)(pipeW), (int)(pipeH), null);
 	}
 	
 	public void moveBird() throws IOException {
@@ -114,6 +118,12 @@ public class GameWindow extends JPanel {
 	public void movePipe() {
 		pipeX1 -= pipeVel;
 		pipeX2 -= pipeVel;
+		pipeX3 -= pipeVel;
+		pipeX4 -= pipeVel;
+		
+		if (pipeX4 <= windowW) {
+			pipeX1 = windowW + (windowW * 0.25);
+		}
 	}
 	
 	
