@@ -17,6 +17,7 @@ public class GameWindow extends JPanel {
 	//VARIABLES
 	//background variables
 		public int windowW = 488, windowH = 712;
+		public double pipeSpace = windowW * 0.5;
 		public Image backgroundImage;
 	//bird variables
 		public Image birdImage;
@@ -27,11 +28,11 @@ public class GameWindow extends JPanel {
 	//pipe variables
 		public Image pipeTop, pipeBottom;
 		public double pipeW = 52, pipeH = 320;
-		public double pipeX1 =  (windowW * 0.75), pipeY1 = 0;
-		public double pipeX2 = (windowW + (windowW * 0.25)), pipeY2 = windowH - pipeH;
-		public double pipeX3 = (windowW + (windowW * 0.75)), pipeY3 = 0;
-		public double pipeX4 = (windowW + (windowW * 1.25)), pipeY4 = windowH - pipeH;
-		public double pipeVel = 3;
+		public double pipeX1 =  windowW, pipeY1 = 0;
+		public double pipeX2 = (windowW + pipeSpace), pipeY2 = windowH - pipeH;
+		public double pipeX3 = (windowW + (pipeSpace * 2)), pipeY3 = 0;
+		public double pipeX4 = (windowW + (pipeSpace * 3)), pipeY4 = windowH - pipeH;
+		public double pipeVel = 4;
 	
 	//CONSTRUCTOR
 	public GameWindow() throws IOException, InterruptedException {
@@ -122,7 +123,7 @@ public class GameWindow extends JPanel {
 		pipeX4 -= pipeVel;
 		
 		if (pipeX4 <= windowW) {
-			pipeX1 = windowW + (windowW * 0.25);
+			pipeX1 = windowW + pipeSpace;
 		}
 	}
 	
