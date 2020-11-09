@@ -25,21 +25,23 @@ public class GameWindow extends JPanel {
 		public double birdVel = 0;
 		public double gravity = 0.5;
 	//pipe variables
-		public Image pipe;
-		public double pipeX1 =  windowW * 0.75, pipeY1 = 0;
+		public Image pipeTop, pipeBottom;
 		public double pipeW = 52, pipeH = 320;
-		public double pipeVel;
+		public double pipeX1 =  (windowW * 0.75), pipeY1 = 0;
+		public double pipeX2 = (windowW + (windowW * 0.25)), pipeY2 = windowH - pipeH;
+		public double pipeVel = 3;
 	
 	//CONSTRUCTOR
 	public GameWindow() throws IOException, InterruptedException {
 		
 		//customize the panel
 		this.setPreferredSize(new Dimension(windowW, windowH));
-		
+		 
 		//load initial Images
 		backgroundImage = ImageIO.read(new File("background-day.png"));
 		birdImage = ImageIO.read(new File("birdMid.png"));
-		pipe = ImageIO.read(new File("pipeTop.png"));
+		pipeTop = ImageIO.read(new File("pipeTop.png"));
+		pipeBottom = ImageIO.read(new File("pipeBottom.png"));
 
 		//make frame to hold panel
 		JFrame mainFrame = new JFrame("Flappy Bird");
@@ -77,7 +79,8 @@ public class GameWindow extends JPanel {
 	public void paint(Graphics g) {
 		g.drawImage(backgroundImage, 0, 0, windowW, windowH, null);
 		g.drawImage(birdImage, (int)(birdX), (int)(birdY), (int)(birdW), (int)(birdH), null);
-		g.drawImage(pipe, (int)(pipeX1), (int)(pipeY1), (int)(pipeW), (int)(pipeH), null);
+		g.drawImage(pipeTop, (int)(pipeX1), (int)(pipeY1), (int)(pipeW), (int)(pipeH), null);
+		g.drawImage(pipeBottom, (int)(pipeX2), (int)(pipeY2), (int)(pipeW), (int)(pipeH), null);
 	}
 	
 	public void moveBird() throws IOException {
@@ -94,6 +97,10 @@ public class GameWindow extends JPanel {
 		}
 	}
 	
+	public void CheckCollison() {
+		
+	}
+	
 	public void setBirdPic() throws IOException {
 		if(birdVel < -0.5) {
 			birdImage = ImageIO.read(new File("birdUp.png"));
@@ -106,6 +113,7 @@ public class GameWindow extends JPanel {
 	
 	public void movePipe() {
 		pipeX1 -= pipeVel;
+		pipeX2 -= pipeVel;
 	}
 	
 	
