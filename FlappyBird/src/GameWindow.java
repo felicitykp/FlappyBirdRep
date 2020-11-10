@@ -1,6 +1,7 @@
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -16,9 +17,12 @@ public class GameWindow extends JPanel {
 	
 	//VARIABLES
 	//background variables
-		public int windowW = 488, windowH = 712;
+		public int windowW = 488, windowH = 600;
 		public double pipeSpace = windowW * 0.5;
 		public Image backgroundImage;
+		public Image gameOverImage;
+		public int gameOverW = 448, gameOverH = 97;
+		public boolean gameOver = false;
 	//bird variables
 		public Image birdImage;
 		public double birdW = 40, birdH = 30;
@@ -28,10 +32,8 @@ public class GameWindow extends JPanel {
 	//pipe variables
 		public Image pipeTop, pipeBottom;
 		public double pipeW = 52, pipeH = 320;
-		public double pipeX1 =  windowW, pipeY1 = 0;
-		public double pipeX2 = (windowW + pipeSpace), pipeY2 = windowH - pipeH;
-		public double pipeX3 = (windowW + (pipeSpace * 2)), pipeY3 = 0;
-		public double pipeX4 = (windowW + (pipeSpace * 3)), pipeY4 = windowH - pipeH;
+		public double[] pipeX = {windowW, (windowW + pipeSpace), (windowW + (pipeSpace * 2)), (windowW + (pipeSpace * 3))};
+		public double[] pipeY = {0, windowH - pipeH, 0, windowH - pipeH};
 		public double pipeVel = 4;
 	
 	//CONSTRUCTOR
@@ -45,6 +47,7 @@ public class GameWindow extends JPanel {
 		birdImage = ImageIO.read(new File("birdMid.png"));
 		pipeTop = ImageIO.read(new File("pipeTop.png"));
 		pipeBottom = ImageIO.read(new File("pipeBottom.png"));
+		gameOverImage = ImageIO.read(new File("gameover.png"));
 
 		//make frame to hold panel
 		JFrame mainFrame = new JFrame("Flappy Bird");
@@ -69,12 +72,14 @@ public class GameWindow extends JPanel {
 		});
 		
 		//run the code
-		while(true) {
+		while(!gameOver) {
 			moveBird();
 			movePipe();
 			mainFrame.getContentPane().repaint();
 			Thread.sleep(33);
-		}
+		} 
+		
+		mainFrame.getContentPane().repaint();
 		
 	}
 	
@@ -82,10 +87,14 @@ public class GameWindow extends JPanel {
 	public void paint(Graphics g) {
 		g.drawImage(backgroundImage, 0, 0, windowW, windowH, null);
 		g.drawImage(birdImage, (int)(birdX), (int)(birdY), (int)(birdW), (int)(birdH), null);
-		g.drawImage(pipeTop, (int)(pipeX1), (int)(pipeY1), (int)(pipeW), (int)(pipeH), null);
-		g.drawImage(pipeBottom, (int)(pipeX2), (int)(pipeY2), (int)(pipeW), (int)(pipeH), null);
-		g.drawImage(pipeTop, (int)(pipeX3), (int)(pipeY3), (int)(pipeW), (int)(pipeH), null);
-		g.drawImage(pipeBottom, (int)(pipeX4), (int)(pipeY4), (int)(pipeW), (int)(pipeH), null);
+		g.drawImage(pipeTop, (int)(pipeX[0]), (int)(pipeY[0]), (int)(pipeW), (int)(pipeH), null);
+		g.drawImage(pipeBottom, (int)(pipeX[1]), (int)(pipeY[1]), (int)(pipeW), (int)(pipeH), null);
+		g.drawImage(pipeTop, (int)(pipeX[2]), (int)(pipeY[2]), (int)(pipeW), (int)(pipeH), null);
+		g.drawImage(pipeBottom, (int)(pipeX[3]), (int)(pipeY[3]), (int)(pipeW), (int)(pipeH), null);
+		
+		if(gameOver == true) {
+			g.drawImage(gameOverImage, 0, 0, gameOverW, gameOverH, null);
+		}
 	}
 	
 	public void moveBird() throws IOException {
@@ -104,6 +113,24 @@ public class GameWindow extends JPanel {
 	
 	public void CheckCollison() {
 		
+		//create rectangle variables for the bird and pipes
+		Rectangle bird = new Rectangle((int)(birdX), (int)(birdY), (int)(birdW), (int)(birdH));
+		Rectangle[] pipes = { new Rectangle((int)(pipeX[0]), (int)(pipeY[0]), (int)(pipeW), (int)(pipeH)),
+								new Rectangle((int)(pipeX[1]), (int)(pipeY[1]), (int)(pipeW), (int)(pipeH)),
+								new Rectangle((int)(pipeX[2]), (int)(pipeY[2]), (int)(pipeW), (int)(pipeH)),
+								new Rectangle((int)(pipeX[3]), (int)(pipeY[3]), (int)(pipeW), (int)(pipeH))};
+		
+		//check intersection
+		if(bird.intersects(pipes[0])) {
+			gameOver = true;
+		} else if (bird.intersects(pipes[1])) {
+			gameOver = true;
+		} else if (bird.intersects(pipes[2])) {
+			gameOver = true;
+		} else if (bird.intersects(pipes[3])) {
+			gameOver = true;
+		}
+		
 	}
 	
 	public void setBirdPic() throws IOException {
@@ -117,16 +144,29 @@ public class GameWindow extends JPanel {
 	}
 	
 	public void movePipe() {
-		pipeX1 -= pipeVel;
-		pipeX2 -= pipeVel;
-		pipeX3 -= pipeVel;
-		pipeX4 -= pipeVel;
 		
-		if (pipeX4 <= windowW) {
-			pipeX1 = windowW + pipeSpace;
+		//have the pipes moves across the screen
+		pipeX[0] -= pipeVel;
+		pipeX[1] -= pipeVel;
+		pipeX[2] -= pipeVel;
+		pipeX[3] -= pipeVel;
+		
+		//resets a pipe once it's off the screen && generate random y
+		if (pipeX[0] <= 0 - pipeW) {
+			pipeX[0] = windowW + (pipeSpace * 2) - pipeW;
+			pipeY[0] = 0 - (Math.random() * (pipeH * 0.4));
+		} else if (pipeX[1] <= 0 - pipeW) {
+			pipeX[1] = windowW + (pipeSpace * 2) - pipeW;
+			pipeY[1] = (windowH - pipeH) + (Math.random() * (pipeH * 0.4));
+		} else if (pipeX[2] <= 0 - pipeW) {
+			pipeX[2] = windowW + (pipeSpace * 2) - pipeW;
+			pipeY[2] = 0 - (Math.random() * (pipeH * 0.4));
+		} else if (pipeX[3] <= 0 - pipeW) {
+			pipeX[3] = windowW + (pipeSpace * 2) - pipeW;
+			pipeY[3] = (windowH - pipeH) + (Math.random() * (pipeH * 0.4));
 		}
+		
 	}
-	
 	
 	//MAIN
 	public static void main(String[] args) throws IOException, InterruptedException {
