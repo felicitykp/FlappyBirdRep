@@ -20,12 +20,10 @@ public class GameWindow extends JPanel {
 		public int windowW = 488, windowH = 600;
 		public double pipeSpace = windowW * 0.5;
 		public Image backgroundImage;
-		public Image gameOverImage;
-		public int gameOverW = windowW - 20, gameOverH = 97;
-		public boolean gameOver = false;
-		public int score = 0;
-		public Image score1Image, score2Image;
-		public int scoreW = 24, scoreH = 36;
+	//reset variables
+		public boolean reset = false;
+		public Image resetImage;
+		public int resetW = windowW - 20, resetH = 40;
 	//bird variables
 		public Image birdImage;
 		public double birdW = 40, birdH = 30;
@@ -38,6 +36,14 @@ public class GameWindow extends JPanel {
 		public double[] pipeX = {windowW, (windowW + pipeSpace), (windowW + (pipeSpace * 2)), (windowW + (pipeSpace * 3))};
 		public double[] pipeY = {0, windowH - pipeH, 0, windowH - pipeH};
 		public double pipeVel = 4;
+	//game over variables
+		public Image gameOverImage;
+		public int gameOverW = windowW - 20, gameOverH = 97;
+		public boolean gameOver = false;
+	//score variables
+		public int score = 0;
+		public Image score1Image, score2Image;
+		public int scoreW = 24, scoreH = 36;
 	
 	//CONSTRUCTOR
 	public GameWindow() throws IOException, InterruptedException {
@@ -53,6 +59,7 @@ public class GameWindow extends JPanel {
 		gameOverImage = ImageIO.read(new File("gameover.png"));
 		score1Image = ImageIO.read(new File("0.png"));
 		score2Image = ImageIO.read(new File("0.png"));
+		resetImage = ImageIO.read(new File("reset.png"));
 		
 
 		//make frame to hold panel
@@ -66,11 +73,19 @@ public class GameWindow extends JPanel {
 		//setup key listener
 		mainFrame.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e) {
+				
+				//space bar
 				if(e.getKeyChar() == ' ') { 
 					if(birdY > 0) {
 						birdVel = -9;
 					} 
 				} 
+				
+				//reset
+				if(e.getKeyChar() == 'r') {
+					reset = true;
+				}
+				
 				mainFrame.getContentPane().repaint();
 			}
 			public void keyTyped(KeyEvent e) {}
@@ -78,15 +93,25 @@ public class GameWindow extends JPanel {
 		});
 		
 		//run the code
-		while(!gameOver) {
-			moveBird();
-			movePipe();
-			updateScore();
+		while(true) {
+			
+			if(!gameOver) {
+				moveBird();
+				movePipe();
+				checkCollison();
+				updateScore();
+				mainFrame.getContentPane().repaint();
+				Thread.sleep(33);
+			}
+			
+			if(reset) {
+				resetAll(); 
+			}
+			
 			mainFrame.getContentPane().repaint();
-			Thread.sleep(33);
 		} 
 		
-		mainFrame.getContentPane().repaint();
+
 		
 	}
 	
@@ -102,7 +127,8 @@ public class GameWindow extends JPanel {
 		g.drawImage(score2Image, scoreW + 13, 10, scoreW, scoreH, null);
 		
 		if(gameOver) {
-			g.drawImage(gameOverImage, 10, (windowH / 2) - gameOverH, gameOverW, gameOverH, null);
+			g.drawImage(gameOverImage, 10, (windowH / 3) - gameOverH, gameOverW, gameOverH, null);
+			g.drawImage(resetImage, 10, ((windowH / 5) * 4), resetW, resetH, null);
 		}
 	}
 	
@@ -120,7 +146,7 @@ public class GameWindow extends JPanel {
 		}
 	}
 	
-	public void CheckCollison() {
+	public void checkCollison() {
 		
 		//create rectangle variables for the bird and pipes
 		Rectangle bird = new Rectangle((int)(birdX), (int)(birdY), (int)(birdW), (int)(birdH));
@@ -143,11 +169,11 @@ public class GameWindow extends JPanel {
 	}
 	
 	public void setBirdPic() throws IOException {
-		if(birdVel < -0.5) {
+		if(birdVel < -0.5) { //going up
 			birdImage = ImageIO.read(new File("birdUp.png"));
-		} else if(birdVel > 0.5) {
+		} else if(birdVel > 0.5) { //going down
 			birdImage = ImageIO.read(new File("birdDown.png"));
-		} else {
+		} else { //not moving or just switching -> mid
 			birdImage = ImageIO.read(new File("birdMid.png"));
 		}
 	}
@@ -175,6 +201,7 @@ public class GameWindow extends JPanel {
 			pipeY[3] = (windowH - pipeH) + (Math.random() * (pipeH * 0.4));
 		}
 		
+		//increase score if a pipe is passed
 		if (pipeX[0] == birdX) {
 			score++;
 		} else if (pipeX[1] == birdX) {
@@ -238,9 +265,31 @@ public class GameWindow extends JPanel {
 		}
 	}
 	
+	public void resetAll() throws IOException {
+	
+		//reset bird
+		birdY = (windowH / 2) - birdH;
+		birdVel = 0;	
+		
+		//reset pipe x locations
+		pipeX[0] = windowW;
+		pipeX[1] = windowW + pipeSpace;
+		pipeX[2] = windowW + (pipeSpace * 2);
+		pipeX[3] = windowW + (pipeSpace * 3);
+		
+		//reset score
+		score = 0;
+		score1Image = ImageIO.read(new File("0.png"));
+		score2Image = ImageIO.read(new File("0.png"));
+		
+		//reset booleans
+		gameOver = false;
+		reset = false;
+	}
 	//MAIN
 	public static void main(String[] args) throws IOException, InterruptedException {
 		GameWindow myGame = new GameWindow();
+		
 	}
 }
 
