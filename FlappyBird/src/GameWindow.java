@@ -92,7 +92,9 @@ public class GameWindow extends JPanel {
 		g.drawImage(pipeTop, (int)(pipeX[2]), (int)(pipeY[2]), (int)(pipeW), (int)(pipeH), null);
 		g.drawImage(pipeBottom, (int)(pipeX[3]), (int)(pipeY[3]), (int)(pipeW), (int)(pipeH), null);
 		
-		if(gameOver == true) {
+		System.out.println(gameOver);
+		
+		if(gameOver) {
 			g.drawImage(gameOverImage, 0, 0, gameOverW, gameOverH, null);
 		}
 	}
