@@ -21,8 +21,11 @@ public class GameWindow extends JPanel {
 		public double pipeSpace = windowW * 0.5;
 		public Image backgroundImage;
 		public Image gameOverImage;
-		public int gameOverW = 448, gameOverH = 97;
+		public int gameOverW = windowW - 20, gameOverH = 97;
 		public boolean gameOver = false;
+		public int score = 0;
+		public Image score1Image, score2Image;
+		public int scoreW = 24, scoreH = 36;
 	//bird variables
 		public Image birdImage;
 		public double birdW = 40, birdH = 30;
@@ -48,6 +51,9 @@ public class GameWindow extends JPanel {
 		pipeTop = ImageIO.read(new File("pipeTop.png"));
 		pipeBottom = ImageIO.read(new File("pipeBottom.png"));
 		gameOverImage = ImageIO.read(new File("gameover.png"));
+		score1Image = ImageIO.read(new File("0.png"));
+		score2Image = ImageIO.read(new File("0.png"));
+		
 
 		//make frame to hold panel
 		JFrame mainFrame = new JFrame("Flappy Bird");
@@ -75,6 +81,7 @@ public class GameWindow extends JPanel {
 		while(!gameOver) {
 			moveBird();
 			movePipe();
+			updateScore();
 			mainFrame.getContentPane().repaint();
 			Thread.sleep(33);
 		} 
@@ -91,11 +98,11 @@ public class GameWindow extends JPanel {
 		g.drawImage(pipeBottom, (int)(pipeX[1]), (int)(pipeY[1]), (int)(pipeW), (int)(pipeH), null);
 		g.drawImage(pipeTop, (int)(pipeX[2]), (int)(pipeY[2]), (int)(pipeW), (int)(pipeH), null);
 		g.drawImage(pipeBottom, (int)(pipeX[3]), (int)(pipeY[3]), (int)(pipeW), (int)(pipeH), null);
-		
-		System.out.println(gameOver);
+		g.drawImage(score1Image, 10, 10, scoreW, scoreH, null);
+		g.drawImage(score2Image, scoreW + 13, 10, scoreW, scoreH, null);
 		
 		if(gameOver) {
-			g.drawImage(gameOverImage, 0, 0, gameOverW, gameOverH, null);
+			g.drawImage(gameOverImage, 10, (windowH / 2) - gameOverH, gameOverW, gameOverH, null);
 		}
 	}
 	
@@ -168,6 +175,67 @@ public class GameWindow extends JPanel {
 			pipeY[3] = (windowH - pipeH) + (Math.random() * (pipeH * 0.4));
 		}
 		
+		if (pipeX[0] == birdX) {
+			score++;
+		} else if (pipeX[1] == birdX) {
+			score++;
+		} else if (pipeX[2] == birdX) {
+			score++;
+		} else if (pipeX[3] == birdX) {
+			score++;
+		}
+		
+	}
+	
+	public void updateScore() throws IOException {
+		
+		//one's place
+		if(score % 10 == 1) {
+			score2Image = ImageIO.read(new File("1.png"));
+		} else if (score % 10 == 2) {
+			score2Image = ImageIO.read(new File("2.png"));
+		} else if (score % 10 == 3) {
+			score2Image = ImageIO.read(new File("3.png"));
+		} else if (score % 10 == 4) {
+			score2Image = ImageIO.read(new File("4.png"));
+		} else if (score % 10 == 5) {
+			score2Image = ImageIO.read(new File("5.png"));
+		} else if (score % 10 == 6) {
+			score2Image = ImageIO.read(new File("6.png"));
+		} else if (score % 10 == 7) {
+			score2Image = ImageIO.read(new File("7.png"));
+		} else if (score % 10 == 8) {
+			score2Image = ImageIO.read(new File("8.png"));
+		} else if (score % 10 == 9) {
+			score2Image = ImageIO.read(new File("9.png"));
+		} else if (score % 10 == 0) {
+			score2Image = ImageIO.read(new File("0.png"));
+		}
+		
+		//tens place
+		if(score < 10) {
+			score1Image = ImageIO.read(new File("0.png"));
+		} else if (score < 20) {
+			score1Image = ImageIO.read(new File("1.png"));
+		} else if (score < 30) {
+			score1Image = ImageIO.read(new File("2.png"));
+		} else if (score < 40) {
+			score1Image = ImageIO.read(new File("3.png"));
+		} else if (score < 50) {
+			score1Image = ImageIO.read(new File("4.png"));
+		} else if (score < 60) {
+			score1Image = ImageIO.read(new File("5.png"));
+		} else if (score < 70) {
+			score1Image = ImageIO.read(new File("6.png"));
+		} else if (score < 80) {
+			score1Image = ImageIO.read(new File("7.png"));
+		} else if (score < 90) {
+			score1Image = ImageIO.read(new File("8.png"));
+		} else if (score < 100) {
+			score1Image = ImageIO.read(new File("9.png"));
+		} else if (score >= 100) {
+			gameOver = true;
+		}
 	}
 	
 	//MAIN
