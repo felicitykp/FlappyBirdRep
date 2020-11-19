@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -14,12 +15,12 @@ import javax.swing.JPanel;
 
 public class GameWindow extends JPanel {
 	
-	
 	//VARIABLES
 	//background variables
 		public int windowW = 488, windowH = 600;
 		public double pipeSpace = windowW * 0.5;
 		public Image backgroundImage;
+		public long time;
 	//reset variables
 		public boolean reset = false;
 		public Image resetImage;
@@ -29,13 +30,15 @@ public class GameWindow extends JPanel {
 		public double birdW = 40, birdH = 30;
 		public double birdX = (windowW/2) - (birdW/2), birdY = (windowH / 2) - birdH;
 		public double birdVel = 0;
-		public double gravity = 0.5;
+		public double gravity = 0.7;
 	//pipe variables
 		public Image pipeTop, pipeBottom;
 		public double pipeW = 52, pipeH = 320;
 		public double[] pipeX = {windowW, (windowW + pipeSpace), (windowW + (pipeSpace * 2)), (windowW + (pipeSpace * 3))};
 		public double[] pipeY = {0, windowH - pipeH, 0, windowH - pipeH};
+		public boolean[] hasScored = {false, false, false, false};
 		public double pipeVel = 4;
+		public double pipeAccel = 0.0006;
 	//game over variables
 		public Image gameOverImage;
 		public int gameOverW = windowW - 20, gameOverH = 97;
@@ -91,6 +94,12 @@ public class GameWindow extends JPanel {
 			public void keyTyped(KeyEvent e) {}
 			public void keyReleased(KeyEvent e) {}	
 		});
+		
+		
+		time = (System.currentTimeMillis()) / 1000;
+		System.out.println(time);
+		
+		
 		
 		//run the code
 		while(true) {
@@ -169,9 +178,9 @@ public class GameWindow extends JPanel {
 	}
 	
 	public void setBirdPic() throws IOException {
-		if(birdVel < -0.5) { //going up
+		if(birdVel < -0.7) { //going up
 			birdImage = ImageIO.read(new File("birdUp.png"));
-		} else if(birdVel > 0.5) { //going down
+		} else if(birdVel > 0.7) { //going down
 			birdImage = ImageIO.read(new File("birdDown.png"));
 		} else { //not moving or just switching -> mid
 			birdImage = ImageIO.read(new File("birdMid.png"));
@@ -179,6 +188,9 @@ public class GameWindow extends JPanel {
 	}
 	
 	public void movePipe() {
+		
+		//increase the velocity
+		pipeVel += pipeAccel;
 		
 		//have the pipes moves across the screen
 		pipeX[0] -= pipeVel;
@@ -190,28 +202,35 @@ public class GameWindow extends JPanel {
 		if (pipeX[0] <= 0 - pipeW) {
 			pipeX[0] = windowW + (pipeSpace * 2) - pipeW;
 			pipeY[0] = 0 - (Math.random() * (pipeH * 0.4));
+			hasScored[0] = false;
 		} else if (pipeX[1] <= 0 - pipeW) {
 			pipeX[1] = windowW + (pipeSpace * 2) - pipeW;
 			pipeY[1] = (windowH - pipeH) + (Math.random() * (pipeH * 0.4));
+			hasScored[1] = false;
 		} else if (pipeX[2] <= 0 - pipeW) {
 			pipeX[2] = windowW + (pipeSpace * 2) - pipeW;
 			pipeY[2] = 0 - (Math.random() * (pipeH * 0.4));
+			hasScored[2] = false;
 		} else if (pipeX[3] <= 0 - pipeW) {
 			pipeX[3] = windowW + (pipeSpace * 2) - pipeW;
 			pipeY[3] = (windowH - pipeH) + (Math.random() * (pipeH * 0.4));
+			hasScored[3] = false;
 		}
 		
 		//increase score if a pipe is passed
-		if (pipeX[0] == birdX) {
+		if(pipeX[0] < birdX && hasScored[0] == false) {
 			score++;
-		} else if (pipeX[1] == birdX) {
+			hasScored[0] = true;
+		} else if(pipeX[1] < birdX && hasScored[1] == false) {
 			score++;
-		} else if (pipeX[2] == birdX) {
+			hasScored[1] = true;
+		} else if(pipeX[2] < birdX && hasScored[2] == false) {
 			score++;
-		} else if (pipeX[3] == birdX) {
+			hasScored[2] = true;
+		} else if(pipeX[3] < birdX && hasScored[3] == false) {
 			score++;
+			hasScored[3] = true;
 		}
-		
 	}
 	
 	public void updateScore() throws IOException {
@@ -271,11 +290,12 @@ public class GameWindow extends JPanel {
 		birdY = (windowH / 2) - birdH;
 		birdVel = 0;	
 		
-		//reset pipe x locations
+		//reset pipes
 		pipeX[0] = windowW;
 		pipeX[1] = windowW + pipeSpace;
 		pipeX[2] = windowW + (pipeSpace * 2);
 		pipeX[3] = windowW + (pipeSpace * 3);
+		pipeVel = 4;
 		
 		//reset score
 		score = 0;
@@ -286,6 +306,7 @@ public class GameWindow extends JPanel {
 		gameOver = false;
 		reset = false;
 	}
+	
 	//MAIN
 	public static void main(String[] args) throws IOException, InterruptedException {
 		GameWindow myGame = new GameWindow();
